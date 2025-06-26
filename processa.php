@@ -1,32 +1,40 @@
 <?php
 
 session_start();
+require_once 'funcoes.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $tituloLivro = filter_input(INPUT_POST, "tituloLivro", FILTER_SANITIZE_SPECIAL_CHARS);
     $autorLivro = filter_input(INPUT_POST, "autorLivro", FILTER_SANITIZE_SPECIAL_CHARS);
     $anoLivro = filter_input(INPUT_POST, "anoLivro", FILTER_VALIDATE_INT);
 
-    if ($tituloLivro && $autorLivro && $anoLivro){
-        if(!isset($_SESSION['livros'])){
-            $_SESSION['livros'] = [];
-        }
+    $erros = [];
 
-        $_SESSION['livros'][] = [
-            'tituloLivro' => $tituloLivro,
-            'autorLivro' => $autorLivro,
-            'anoLivro' => $anoLivro
-        ];
+    validarCampoTexto($tituloLivro, 'Título do livro', $erros);
+    validarCampoTexto($autorLivro, 'Autor do livro', $erros);
 
-        echo "Livro adicionado com sucesso!<br><br>";
-        echo "<a href='formulario.php'>Adicionar outros livros</a><br>";
-        echo "<a href='lista.php'>Ver lista de livros</a>";
-    } else{
-        echo "Por favor, preencha todos os campos corretamente<br>";
-        echo "<a href='formulario.php'>Voltar</a>";
+    if ($anoLivro === false || $anoLivro <= 0){
+        $erros[] = "O ano do livro deve ser um número inteiro válido e positivo!";
     }
-} else{
-    echo "Acesso inválido, pois só está permitido o formulário e a lista!";
-}
 
-?>
+    if (count($erros) > 0){
+        $_SESSION['erros'] = $erros; 
+        $_SESSION['antigaSessao'] = $_POST;
+
+        header('Location: formulario.php');
+        exit;
+    }
+
+    if (!isset($_SESSION['livros'])){
+        $_SESSION['livros'] = [];
+    }
+
+    $_SESSION['livros'][] = [
+        'tituloLivro' => $tituloLivro,
+        'autorLivro' => $autorLivro,
+        'anoLivro' => $anoLivro
+    ];
+
+    header('Location: lista.php');
+    exit;
+}
