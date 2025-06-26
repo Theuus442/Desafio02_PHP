@@ -11,7 +11,7 @@
         Título do livro: <input type="text" name="tituloLivro">
         Autor <input type="text" name="autorLivro">
         Ano do livro <input type="text" name="anoLivro">
-        <input type="submit" value="enviar Informação">
+        <input type="submit" value="enviar">
     </form>
 </body>
 </html>
